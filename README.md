@@ -310,12 +310,6 @@
 
 ---
 
-## Exploratory Data Analysis (EDA)
-
-https://www.figma.com/design/F4hrhUZ74neLPPxAwcYVLj/Readmission-Rate-InfoGraphic?node-id=1-2&t=vGOaUQUJylJ06Xsk-0
-
----
-
 ## Key Findings
 
 - Mental health-related diagnoses are associated with significantly higher readmission rates than non-mental health diagnoses.
