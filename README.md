@@ -437,3 +437,4 @@
 - Length of stay was included as a study variable.
 - ICD codes were aggregated into broad categories rather than examined at a granular level.
 - Data were collected from a single hospital, limiting the generalizability of findings.
+- Only 30 day admissions were included. Readmissions beyond 30 days were not captured, limiting analyzing longer-term outcomes.
