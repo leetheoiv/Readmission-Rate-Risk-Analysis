@@ -350,7 +350,7 @@
     stat, pval = proportions_ztest(count=successes, nobs=observations, alternative='larger')
     ```
     
-    - z-statistic: 197.6443080104927, p-value: 0.0
+    - z-statistic: 193.6980317974423, p-value: 0.0
     
     ```python
     
@@ -363,8 +363,8 @@
     effect_size = proportion_effectsize(p1_MH,p2_Non_MH)
     ```
     
-    - Effect Size (Cohen's h): 0.5714
-    - Approximately 50% of emergency department admissions for mental health issues were readmissions, compared to only about 23% for non-mental health-related admissions. To test the significance of these results, a one-tailed proportion z-test indicated that patients diagnosed with a mental health disorder have significantly higher readmission rates compared to those diagnosed with a non-mental health-related disorder (z = 197.64, p < 0.05). The effect size was moderate (Cohen’s h = 0.57), suggesting that the observed difference is not only statistically significant but also practically meaningful in the healthcare context. This indicates that even a small reduction in readmission rates in patients diagnosed with a mental health disorder could have an impact on the overall readmission rate and have broader implications such reducing financial impact to the hospital and patient.
+    - Effect Size (Cohen's h): 0.5530
+    - Approximately 49% of emergency department admissions for mental health issues were readmissions, compared to only about 23% for non-mental health-related admissions. To test the significance of these results, a one-tailed proportion z-test indicated that patients diagnosed with a mental health disorder have significantly higher readmission rates compared to those diagnosed with a non-mental health-related disorder (z = 193.70, p = 0.0). The effect size was moderate (Cohen’s h = 0.55), suggesting that the observed difference is not only statistically significant but also practically meaningful in the healthcare context. This indicates that even a small reduction in readmission rates in patients diagnosed with a mental health disorder could have an impact on the overall readmission rate and have broader implications such reducing financial impact to the hospital and patient.
 2. **Research Question:** Do patients that have died have a higher readmission rate compared to those who have not died?
     
     **Where:**
@@ -392,7 +392,7 @@
     print(f'z-statistic: {stat}, p-value: {pval}'
     ```
     
-    - z-statistic: 1.9231436277010432, p-value: 0.027231007282238293
+    - z-statistic: 2.060378919112351, p-value: 0.019681165304425843
     
     ```python
     p1_expired = readmission_rates_and_mortality.iloc[1]['percent_total_readmissions'] / 100
@@ -403,8 +403,8 @@
     print(f"Effect Size (Cohen's h): {effect_size:.4f}")
     ```
     
-    - Effect Size (Cohen's h): 0.5195
-    - A one-tailed proportion z-test indicated that patients who died had significantly higher readmission rates compared to those who survived (z = 1.92, p < 0.05). The effect size was moderate (Cohen’s h = 0.52), suggesting that the difference is not only statistically significant but also potentially meaningful in a clinical context. These findings suggest an association between higher readmission rates and mortality. However, further research is necessary to understand the underlying causes of mortality and whether reducing readmissions could impact patient survival.
+    - Effect Size (Cohen's h): 0.9903
+    - A one-tailed proportion z-test indicated that patients who died had significantly higher readmission rates compared to those who survived (z = 2.06, p = 0.019). The effect size was high (Cohen’s h = 0.99), suggesting that the difference is not only statistically significant but also potentially meaningful in a clinical context. These findings suggest an association between higher readmission rates and mortality. However, further research is necessary to understand the underlying causes of mortality and whether reducing readmissions could impact patient survival.
     
 
 ---
