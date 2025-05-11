@@ -13,7 +13,7 @@
 - Identify which mental health diagnoses have the highest readmission rates.
 - Examine disparities in readmission rates across racial, age, and gender groups.
 - Explore the interaction between marital status and readmission rates.
-- Investigate diagnoses with the highest readmission rates.
+- Explore how readmission rates differ based on arrival transport and disposition.
 - Provide data-driven recommendations to reduce readmission rates.
 
 ---
@@ -322,7 +322,7 @@
 
 ## Results
 
-1. **Research Question:** Are readmission rates among patients diagnosed with some mental health disorder significantly higher than those of patients not diagnosed with a mental health disorder?
+1. **Research Question:** Do patients with mental health diagnoses face higher 30-day readmission rates than those with non-mental health diagnoses in the Emergency Department?
     
     **Where:**
     
