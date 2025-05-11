@@ -412,21 +412,22 @@
 ## Recommendations
 
 1. **Target High-Risk Mental Health Diagnoses**
-    1. Implement targeted discharge planning and follow-up care for patients with substance-related and behavioral disorders. 
-    2. Consider specialized care transfers or integrated behavioral health programs.
+    1. Implement targeted discharge planning and follow-up care for patients with substance-related and behavioral disorders such as scheduled calls and patient medication management education.
+    2. Ensure adequate hand-offs to behavioral health programs .
 2. **Demographic Specific Support Programs**
     1. Develop peer-support networks or community health outreach focused on unmarried or single men aged 40–59.
     2. Incorporate mental health check-ins as part of follow-up protocols for this demographic.
 3. **Address Racial Disparities**
-    1. Conduct further analysis to identify root causes of higher readmission rates among certain racial/ethnic groups.
+    1. Conduct further analysis to identify root causes of higher readmission rates among certain racial/ethnic groups by surveying patients about specific and perceived barriers to care.
     2. Develop tailored interventions to improve care engagement and outcomes.
 4. **Reduce Patients Leaving Without Treatment**
     1. Investigate root causes of patients leaving the ED without being seen, such as long wait times, lack of communication, or unclear expectations.
-    2. Ensure early patient engagement by having staff initiate contact immediately upon arrival, even if clinical care is delayed
+    2. Ensure early patient engagement by having staff initiate contact immediately upon arrival, even if clinical care is delayed.
 5. **Collect and Leverage Socioeconomic Data**
     1. Begin tracking income, employment status, housing stability, and other social determinants of health. Use this data to design equity-focused interventions and improve access to care.
 6. **Investigate Readmission-Mortality Link**
     1. Explore whether care coordination factors are contributing to increased mortality. Use findings to refine care transition protocols and prevent avoidable adverse outcomes.
+    2. Collect data on hospital related complications.
 
 ---
 
