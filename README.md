@@ -322,7 +322,7 @@
 
 ## Results
 
-1. **Research Question:** Are readmission rates among patients diagnosed with some mental health disorder significantly higher than those of patients not diagnosed with a mental health disorder?
+1. **Research Question:** Do patients with mental health diagnoses face higher 30-day readmission rates than those with non-mental health diagnoses in the Emergency Department?
     
     **Where:**
     
