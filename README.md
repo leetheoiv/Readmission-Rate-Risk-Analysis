@@ -350,7 +350,7 @@
     stat, pval = proportions_ztest(count=successes, nobs=observations, alternative='larger')
     ```
     
-    - z-statistic: 197.6443080104927, p-value: 0.0
+    - z-statistic: 193.6980317974423, p-value: 0.0
     
     ```python
     
@@ -363,8 +363,8 @@
     effect_size = proportion_effectsize(p1_MH,p2_Non_MH)
     ```
     
-    - Effect Size (Cohen's h): 0.5714
-    - Approximately 50% of emergency department admissions for mental health issues were readmissions, compared to only about 23% for non-mental health-related admissions. To test the significance of these results, a one-tailed proportion z-test indicated that patients diagnosed with a mental health disorder have significantly higher readmission rates compared to those diagnosed with a non-mental health-related disorder (z = 197.64, p < 0.05). The effect size was moderate (Cohen’s h = 0.57), suggesting that the observed difference is not only statistically significant but also practically meaningful in the healthcare context. This indicates that even a small reduction in readmission rates in patients diagnosed with a mental health disorder could have an impact on the overall readmission rate and have broader implications such reducing financial impact to the hospital and patient.
+    - Effect Size (Cohen's h): 0.5530
+    - Approximately 49% of emergency department admissions for mental health issues were readmissions, compared to only about 23% for non-mental health-related admissions. To test the significance of these results, a one-tailed proportion z-test indicated that patients diagnosed with a mental health disorder have significantly higher readmission rates compared to those diagnosed with a non-mental health-related disorder (z = 193.70, p = 0.0). The effect size was moderate (Cohen’s h = 0.55), suggesting that the observed difference is not only statistically significant but also practically meaningful in the healthcare context. This indicates that even a small reduction in readmission rates in patients diagnosed with a mental health disorder could have an impact on the overall readmission rate and have broader implications such reducing financial impact to the hospital and patient.
 2. **Research Question:** Do patients that have died have a higher readmission rate compared to those who have not died?
     
     **Where:**
@@ -392,7 +392,7 @@
     print(f'z-statistic: {stat}, p-value: {pval}'
     ```
     
-    - z-statistic: 1.9231436277010432, p-value: 0.027231007282238293
+    - z-statistic: 2.060378919112351, p-value: 0.019681165304425843
     
     ```python
     p1_expired = readmission_rates_and_mortality.iloc[1]['percent_total_readmissions'] / 100
@@ -403,8 +403,8 @@
     print(f"Effect Size (Cohen's h): {effect_size:.4f}")
     ```
     
-    - Effect Size (Cohen's h): 0.5195
-    - A one-tailed proportion z-test indicated that patients who died had significantly higher readmission rates compared to those who survived (z = 1.92, p < 0.05). The effect size was moderate (Cohen’s h = 0.52), suggesting that the difference is not only statistically significant but also potentially meaningful in a clinical context. These findings suggest an association between higher readmission rates and mortality. However, further research is necessary to understand the underlying causes of mortality and whether reducing readmissions could impact patient survival.
+    - Effect Size (Cohen's h): 0.9903
+    - A one-tailed proportion z-test indicated that patients who died had significantly higher readmission rates compared to those who survived (z = 2.06, p = 0.019). The effect size was high (Cohen’s h = 0.99), suggesting that the difference is not only statistically significant but also potentially meaningful in a clinical context. These findings suggest an association between higher readmission rates and mortality. However, further research is necessary to understand the underlying causes of mortality and whether reducing readmissions could impact patient survival.
     
 
 ---
@@ -412,21 +412,22 @@
 ## Recommendations
 
 1. **Target High-Risk Mental Health Diagnoses**
-    1. Implement targeted discharge planning and follow-up care for patients with substance-related and behavioral disorders. 
-    2. Consider specialized care transfers or integrated behavioral health programs.
+    1. Implement targeted discharge planning and follow-up care for patients with substance-related and behavioral disorders such as scheduled calls and patient medication management education.
+    2. Ensure adequate hand-offs to behavioral health programs .
 2. **Demographic Specific Support Programs**
     1. Develop peer-support networks or community health outreach focused on unmarried or single men aged 40–59.
     2. Incorporate mental health check-ins as part of follow-up protocols for this demographic.
 3. **Address Racial Disparities**
-    1. Conduct further analysis to identify root causes of higher readmission rates among certain racial/ethnic groups.
+    1. Conduct further analysis to identify root causes of higher readmission rates among certain racial/ethnic groups by surveying patients about specific and perceived barriers to care.
     2. Develop tailored interventions to improve care engagement and outcomes.
 4. **Reduce Patients Leaving Without Treatment**
     1. Investigate root causes of patients leaving the ED without being seen, such as long wait times, lack of communication, or unclear expectations.
-    2. Ensure early patient engagement by having staff initiate contact immediately upon arrival, even if clinical care is delayed
+    2. Ensure early patient engagement by having staff initiate contact immediately upon arrival, even if clinical care is delayed.
 5. **Collect and Leverage Socioeconomic Data**
     1. Begin tracking income, employment status, housing stability, and other social determinants of health. Use this data to design equity-focused interventions and improve access to care.
 6. **Investigate Readmission-Mortality Link**
     1. Explore whether care coordination factors are contributing to increased mortality. Use findings to refine care transition protocols and prevent avoidable adverse outcomes.
+    2. Collect data on hospital related complications.
 
 ---
 
