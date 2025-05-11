@@ -13,7 +13,7 @@
 - Identify which mental health diagnoses have the highest readmission rates.
 - Examine disparities in readmission rates across racial, age, and gender groups.
 - Explore the interaction between marital status and readmission rates.
-- Investigate diagnoses with the highest readmission rates.
+- Explore how readmission rates differ based on arrival transport and disposition.
 - Provide data-driven recommendations to reduce readmission rates.
 
 ---
