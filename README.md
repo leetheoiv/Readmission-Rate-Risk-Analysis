@@ -1,4 +1,4 @@
-![Mental Health Data Analysis](mental_health_data_analysis.png)
+![Mental Health Data Analysis](graphs/mental_health_data_analysis.png)
 
 ## **Project Introduction**
 
