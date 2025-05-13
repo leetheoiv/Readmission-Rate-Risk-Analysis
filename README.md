@@ -1,5 +1,10 @@
 ![Mental Health Data Analysis](graphs/mental_health_data_analysis.png)
 
+📓 **Jupyter Notebook:**  
+Explore the full analysis in the notebook here:  
+[Readmission Rate Analysis.ipynb](./Readmission%20Rate%20Analysis.ipynb)
+
+
 ## **Project Introduction**
 
 Since I’ve began my journey into the data science field, I’ve been driven by one question: how can we use data to improve mental health outcomes? That curiosity has led me to explore healthcare quality frameworks, specifically SEPTEE(Safety, Effectiveness, Patient-centeredness, Timeliness, Efficiency, Equity).
