@@ -8,7 +8,7 @@ Using these dimensions, I identified readmission rates as a key indicator. Prior
 
 This led me to my primary research question: Do patients with mental health diagnoses face higher 30-day readmission rates than those with non-mental health diagnoses in the Emergency Department (ED)?
 
-To answer this question I analyzed 450K ED visits from the Beth Israel MIMIC-IV dataset (10 years of deidentified patient data), using BigQuery SQL for data querying and Python for statistical testing and visualization.
+To answer this question I analyzed 450K ED visits from the Beth Israel MIMIC-IV dataset (10 years of de-identified patient data), using BigQuery SQL for data querying and Python for statistical testing and visualization.
 
 ---
 
@@ -48,23 +48,95 @@ To answer this question I analyzed 450K ED visits from the Beth Israel MIMIC-IV 
     - ***disposition***: The method through which the individual left the ED.
     - ***name_medication***: The name of any current medications the patient was taking on admission
 
-- **Size & scope**:
+- **Size**:
     - MIMIC-IV contains data from 2008-2019
     - Analyzed 457,823 amount of rows max
-
----
-
-## Data Cleaning & Preprocessing
-
-1. **Readmission Identification**
-- Built a `readmissions` CTE from the `edstays` table to link each index ED visit (`index_stay_id`) with any subsequent visit (`readmit_stay_id`) for the same patient occurring 1–30 days after discharge.
-- Filtered out self-matches and same-day overlaps to ensure true readmissions.
-- Flagged each record with:
-    - `had_readmission_within_30` (index stays followed by a readmission)
-    - `is_readmission` (visits that are themselves readmissions)
-- SQL Query
+- Table Modification:
     
-    ```sql
+    ### 1. Diagnosis Category Mapping
+    
+    - Creates broad mental health vs. non–mental health flags by mapping ICD-9/ICD-10 codes to categories.
+        
+        ```python
+        
+        -- icd-10 code info: https://www.icd10data.com/ICD10CM/Codes/F01-F99
+        -- icd-9  code info: https://en.wikipedia.org/wiki List_of_ICD-9_codes_290%E2%80%93319:_mental_disorders
+        SELECT 
+        *,
+          CASE
+              WHEN mental_health_category IN ('Childhood and Adolescent',
+                                              'Unspecified Mental Disorders',
+                                              'Organic Mental Health Disorders',
+                                              'Substance-Related Mental Disorders',
+                                              'Psychotic Disorders',
+                                              'Mood Disorders',
+                                              'Anxiety and Related Disorders',
+                                              'Behavioral Syndromes',
+                                              'Personality and Behavioral Disorders',
+                                              'Intellectual Disabilities',
+                                              'Developmental Disorders',
+                                              'Childhood and Adolescent Disorders',
+                                              'Unspecified Mental Disorders') THEN 1
+              ELSE 0 
+          END AS is_mh_disorder -- Flag whether a diagnosis is a mental health disorder
+        FROM
+        (SELECT 
+          ed.subject_id,
+          ed.stay_id,
+          icd_code,
+          seq_num,
+          icd_version,
+          icd_title,
+          CASE 
+                -- Organic Mental Health Disorders
+                WHEN LEFT(icd_code, 3) IN ('290', '293', '294', 'F01','F06','F07', 'F02', 'F03', 'F04', 'F05','F09') THEN 'Organic Mental Health Disorders'
+        
+                -- Substance-Related Mental Disorders
+                WHEN LEFT(icd_code, 3) IN ('303', '291', '292', '304', '305', 'F10', 'F11', 'F12', 'F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19') THEN 'Substance-Related Mental Disorders'
+        
+                -- Psychotic Disorders
+                WHEN LEFT(icd_code, 3) IN ('295', '297', '298', 'F20', 'F21', 'F22', 'F23', 'F24', 'F25', 'F28', 'F29') THEN 'Psychotic Disorders'
+        
+                -- Mood Disorders
+                WHEN LEFT(icd_code, 3) IN ('296', '311', 'F30', 'F31', 'F32', 'F33', 'F34', 'F39') THEN 'Mood Disorders'
+        
+                -- Anxiety and Related Disorders
+                WHEN LEFT(icd_code, 3) IN ('300', 'F40', 'F41', 'F42', 'F43', 'F44', 'F45', 'F48') THEN 'Anxiety and Related Disorders'
+        
+                -- Behavioral Syndromes
+                WHEN LEFT(icd_code, 3) IN ('305', 'F50', 'F51', 'F52', 'F53', 'F54', 'F55') THEN 'Behavioral Syndromes'
+        
+                -- Personality and Behavioral Disorders
+                WHEN LEFT(icd_code, 3) IN ('301', 'F60', 'F61', 'F62', 'F63', 'F64', 'F65', 'F66', 'F68', 'F69') THEN 'Personality and Behavioral Disorders'
+        
+                -- Intellectual Disabilities
+                WHEN LEFT(icd_code, 3) IN ('317', '318', '319', 'F70', 'F71', 'F72', 'F73', 'F74', 'F75', 'F79') THEN 'Intellectual Disabilities'
+        
+                -- Developmental Disorders
+                WHEN LEFT(icd_code, 3) IN ('299', '313', 'F80', 'F81', 'F82', 'F83', 'F84', 'F85', 'F88', 'F89') THEN 'Developmental Disorders'
+        
+                -- Childhood and Adolescent Disorders
+                WHEN LEFT(icd_code, 3) IN ('312', '313', 'F90', 'F91', 'F92', 'F93', 'F94', 'F95', 'F98') THEN 'Childhood and Adolescent Disorders'
+        
+                -- Unspecified Mental Disorders
+                WHEN LEFT(icd_code, 3) IN ('290', '299', 'F99') THEN 'Unspecified Mental Disorders'
+        
+                ELSE 'Non-MH-Disorder'
+          END AS mental_health_category
+        FROM `physionet-data.mimiciv_ed.diagnosis` AS d
+        
+        LEFT JOIN
+          `physionet-data.mimiciv_ed.edstays` AS ed
+        ON
+          ed.stay_id = d.stay_id)
+        ```
+        
+
+### 2. Readmission Cohort Construction
+
+- Builds a CTE to pair each index visit (initial visit before readmission) with any subsequent ED visit within 1–30 days, then flags index stays and readmissions.
+    
+    ```python
     -- Discharge-to-Admit 
     WITH readmissions AS (
       SELECT 
@@ -97,13 +169,13 @@ To answer this question I analyzed 450K ED visits from the Beth Israel MIMIC-IV 
       DATE_DIFF(outtime,intime,hour) AS LOS_hr, -- length of stay in hours
       r.days_between AS days_to_readmission,
     
-     -- Flag if this stay (index stay) was followed by a readmission 
+     -- Flag if this stay was followed by a readmission (index stay)
       CASE
         WHEN ed.stay_id IN (SELECT index_stay_id FROM readmissions) THEN 1
         ELSE 0
       END AS had_readmission_within_30,
     
-      -- Flag if this stay IS a readmission (readmission stay)
+      -- Flag if this stay IS a readmission
       CASE
         WHEN ed.stay_id IN (SELECT readmit_stay_id FROM readmissions) THEN 1
         ELSE 0
@@ -120,206 +192,169 @@ To answer this question I analyzed 450K ED visits from the Beth Israel MIMIC-IV 
     ORDER BY subject_id ASC
     ```
     
-1. **Demographics & Grouping**
-- Joined `edstays` with `patients` and `admissions` tables to assemble patient demographics.
-- Created standardized categories:
-    - **Age** in 10-year bins (0–9, 10–19, …, 90+)
-    - **Race/Ethnicity** consolidated into broad groups (e.g., White, Black/African American, Hispanic/Latino, Asian, Other)
-- SQL Query
+
+### 3. Demographic Grouping
+
+- Aggregates patient age into 10-year bins and creates broader race categories.
+
+```python
+SELECT 
+  DISTINCT(ed.subject_id),
+  ed.gender,
+  p.anchor_age,
+  insurance,
+  marital_status,
+  a.language,
+  CASE
+    WHEN p.anchor_age BETWEEN 0 AND 9 THEN '0-9'
+    WHEN p.anchor_age BETWEEN 10 AND 19 THEN '10-19'
+    WHEN p.anchor_age BETWEEN 20 AND 29 THEN '20-29'
+    WHEN p.anchor_age BETWEEN 30 AND 39 THEN '30-39'
+    WHEN p.anchor_age BETWEEN 40 AND 49 THEN '40-49'
+    WHEN p.anchor_age BETWEEN 50 AND 59 THEN '50-59'
+    WHEN p.anchor_age BETWEEN 60 AND 69 THEN '60-69'
+    WHEN p.anchor_age BETWEEN 70 AND 79 THEN '70-79'
+    WHEN p.anchor_age BETWEEN 80 AND 89 THEN '80-89'
+    WHEN p.anchor_age >= 90 THEN '90+'
+    ELSE 'Unknown'
+  END AS age_group,
+  p.dod,
+  CASE
+    -- Broad “Asian” group
+    WHEN ed.race IN (
+      'ASIAN',
+      'ASIAN - CHINESE',
+      'ASIAN - SOUTH EAST ASIAN',
+      'ASIAN - ASIAN INDIAN',
+      'ASIAN - KOREAN'
+    ) THEN 'Asian'
     
-    ```sql
-    SELECT 
-      DISTINCT(ed.subject_id),
-      ed.gender,
-      p.anchor_age,
-      insurance,
-      marital_status,
-      a.language,
-      CASE
-        WHEN p.anchor_age BETWEEN 0 AND 9 THEN '0-9'
-        WHEN p.anchor_age BETWEEN 10 AND 19 THEN '10-19'
-        WHEN p.anchor_age BETWEEN 20 AND 29 THEN '20-29'
-        WHEN p.anchor_age BETWEEN 30 AND 39 THEN '30-39'
-        WHEN p.anchor_age BETWEEN 40 AND 49 THEN '40-49'
-        WHEN p.anchor_age BETWEEN 50 AND 59 THEN '50-59'
-        WHEN p.anchor_age BETWEEN 60 AND 69 THEN '60-69'
-        WHEN p.anchor_age BETWEEN 70 AND 79 THEN '70-79'
-        WHEN p.anchor_age BETWEEN 80 AND 89 THEN '80-89'
-        WHEN p.anchor_age >= 90 THEN '90+'
-        ELSE 'Unknown'
-      END AS age_group,
-      p.dod,
-      CASE
-        -- Broad “Asian” group
-        WHEN ed.race IN (
-          'ASIAN',
-          'ASIAN - CHINESE',
-          'ASIAN - SOUTH EAST ASIAN',
-          'ASIAN - ASIAN INDIAN',
-          'ASIAN - KOREAN'
-        ) THEN 'Asian'
-        
-        -- American Indian / Alaska Native
-        WHEN ed.race = 'AMERICAN INDIAN/ALASKA NATIVE' 
-          THEN 'American Indian / Alaska Native'
-    
-        -- Broad “White” group (including European sub‐groups + Portuguese)
-        WHEN ed.race IN (
-          'WHITE',
-          'WHITE - EASTERN EUROPEAN',
-          'WHITE - RUSSIAN',
-          'WHITE - BRAZILIAN',
-          'WHITE - OTHER EUROPEAN',
-          'PORTUGUESE'
-        ) THEN 'White'
-    
-        -- Broad “Black/African American” group
-        WHEN ed.race IN (
-          'BLACK/AFRICAN AMERICAN',
-          'BLACK/AFRICAN',
-          'BLACK/CAPE VERDEAN',
-          'BLACK/CARIBBEAN ISLAND'
-        ) THEN 'Black / African American'
-    
-        -- Broad “Hispanic/Latino” group (all sub‐categories + South American)
-        WHEN ed.race IN (
-          'HISPANIC OR LATINO',
-          'HISPANIC/LATINO - DOMINICAN',
-          'HISPANIC/LATINO - PUERTO RICAN',
-          'HISPANIC/LATINO - MEXICAN',
-          'HISPANIC/LATINO - CENTRAL AMERICAN',
-          'HISPANIC/LATINO - GUATEMALAN',
-          'HISPANIC/LATINO - COLUMBIAN',
-          'HISPANIC/LATINO - SALVADORAN',
-          'SOUTH AMERICAN'
-        ) THEN 'Hispanic / Latino'
-    
-        -- Native Hawaiian / Other Pacific Islander
-        WHEN ed.race = 'NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER' 
-          THEN 'Native Hawaiian / Pacific Islander'
-    
-        -- Multiple races
-        WHEN ed.race = 'MULTIPLE RACE/ETHNICITY' 
-          THEN 'Multiple Race / Ethnicity'
-    
-        -- Unknown / declined / unable to obtain
-        WHEN ed.race IN (
-          'UNKNOWN',
-          'PATIENT DECLINED TO ANSWER',
-          'UNABLE TO OBTAIN'
-        ) THEN 'Unknown / Declined / Unable to Obtain'
-    
-        -- Everything else (e.g., code “OTHER” or any unanticipated string)
-        ELSE 'Other'
-      END AS race_group,
-      ed.race
-    
-    FROM 
-      `physionet-data.mimiciv_ed.edstays` AS ed
-    LEFT JOIN 
-      `physionet-data.mimiciv_3_1_hosp.patients` AS p
-    ON 
-      ed.subject_id = p.subject_id
-    LEFT JOIN 
-      `physionet-data.mimiciv_3_1_hosp.admissions` AS a
-    ON
-      ed.subject_id = a.subject_id
-    
-    ORDER BY subject_id ASC
-    ```
-    
-1.  **Diagnosis Mapping & Flagging**
-- Merged ED stays with `diagnosis` records and mapped ICD-9/ICD-10 codes via `LEFT(icd_code, 3)` to mental health categories (mood, anxiety, psychotic, substance-related, etc.).
-- Introduced `is_mh_disorder` (binary) to flag any mental health–related diagnosis.
-- SQL Query
-    
-    ```sql
-    -- icd-10 code info: https://www.icd10data.com/ICD10CM/Codes/F01-F99
-    -- icd-9  code info: https://en.wikipedia.org/wiki List_of_ICD-9_codes_290%E2%80%93319:_mental_disorders
-    SELECT 
-    *,
-      CASE
-          WHEN mental_health_category IN ('Childhood and Adolescent',
-                                          'Unspecified Mental Disorders',
-                                          'Organic Mental Health Disorders',
-                                          'Substance-Related Mental Disorders',
-                                          'Psychotic Disorders',
-                                          'Mood Disorders',
-                                          'Anxiety and Related Disorders',
-                                          'Behavioral Syndromes',
-                                          'Personality and Behavioral Disorders',
-                                          'Intellectual Disabilities',
-                                          'Developmental Disorders',
-                                          'Childhood and Adolescent Disorders',
-                                          'Unspecified Mental Disorders') THEN 1
-          ELSE 0 
-      END AS is_mh_disorder -- Flag whether a diagnosis is a mental health disorder
-    FROM
-    (SELECT 
-      ed.subject_id,
-      ed.stay_id,
-      icd_code,
-      seq_num,
-      icd_version,
-      icd_title,
-      CASE 
-            -- Organic Mental Health Disorders
-            WHEN LEFT(icd_code, 3) IN ('290', '293', '294', 'F01','F06','F07', 'F02', 'F03', 'F04', 'F05','F09') THEN 'Organic Mental Health Disorders'
-    
-            -- Substance-Related Mental Disorders
-            WHEN LEFT(icd_code, 3) IN ('303', '291', '292', '304', '305', 'F10', 'F11', 'F12', 'F13', 'F14', 'F15', 'F16', 'F17', 'F18', 'F19') THEN 'Substance-Related Mental Disorders'
-    
-            -- Psychotic Disorders
-            WHEN LEFT(icd_code, 3) IN ('295', '297', '298', 'F20', 'F21', 'F22', 'F23', 'F24', 'F25', 'F28', 'F29') THEN 'Psychotic Disorders'
-    
-            -- Mood Disorders
-            WHEN LEFT(icd_code, 3) IN ('296', '311', 'F30', 'F31', 'F32', 'F33', 'F34', 'F39') THEN 'Mood Disorders'
-    
-            -- Anxiety and Related Disorders
-            WHEN LEFT(icd_code, 3) IN ('300', 'F40', 'F41', 'F42', 'F43', 'F44', 'F45', 'F48') THEN 'Anxiety and Related Disorders'
-    
-            -- Behavioral Syndromes
-            WHEN LEFT(icd_code, 3) IN ('305', 'F50', 'F51', 'F52', 'F53', 'F54', 'F55') THEN 'Behavioral Syndromes'
-    
-            -- Personality and Behavioral Disorders
-            WHEN LEFT(icd_code, 3) IN ('301', 'F60', 'F61', 'F62', 'F63', 'F64', 'F65', 'F66', 'F68', 'F69') THEN 'Personality and Behavioral Disorders'
-    
-            -- Intellectual Disabilities
-            WHEN LEFT(icd_code, 3) IN ('317', '318', '319', 'F70', 'F71', 'F72', 'F73', 'F74', 'F75', 'F79') THEN 'Intellectual Disabilities'
-    
-            -- Developmental Disorders
-            WHEN LEFT(icd_code, 3) IN ('299', '313', 'F80', 'F81', 'F82', 'F83', 'F84', 'F85', 'F88', 'F89') THEN 'Developmental Disorders'
-    
-            -- Childhood and Adolescent Disorders
-            WHEN LEFT(icd_code, 3) IN ('312', '313', 'F90', 'F91', 'F92', 'F93', 'F94', 'F95', 'F98') THEN 'Childhood and Adolescent Disorders'
-    
-            -- Unspecified Mental Disorders
-            WHEN LEFT(icd_code, 3) IN ('290', '299', 'F99') THEN 'Unspecified Mental Disorders'
-    
-            ELSE 'Non-MH-Disorder'
-      END AS mental_health_category
-    FROM `physionet-data.mimiciv_ed.diagnosis` AS d
-    
-    LEFT JOIN
-      `physionet-data.mimiciv_ed.edstays` AS ed
-    ON
-      ed.stay_id = d.stay_id
-    
-    )
-    ```
-    
+    -- American Indian / Alaska Native
+    WHEN ed.race = 'AMERICAN INDIAN/ALASKA NATIVE' 
+      THEN 'American Indian / Alaska Native'
+
+    -- Broad “White” group (including European sub‐groups + Portuguese)
+    WHEN ed.race IN (
+      'WHITE',
+      'WHITE - EASTERN EUROPEAN',
+      'WHITE - RUSSIAN',
+      'WHITE - BRAZILIAN',
+      'WHITE - OTHER EUROPEAN',
+      'PORTUGUESE'
+    ) THEN 'White'
+
+    -- Broad “Black/African American” group
+    WHEN ed.race IN (
+      'BLACK/AFRICAN AMERICAN',
+      'BLACK/AFRICAN',
+      'BLACK/CAPE VERDEAN',
+      'BLACK/CARIBBEAN ISLAND'
+    ) THEN 'Black / African American'
+
+    -- Broad “Hispanic/Latino” group (all sub‐categories + South American)
+    WHEN ed.race IN (
+      'HISPANIC OR LATINO',
+      'HISPANIC/LATINO - DOMINICAN',
+      'HISPANIC/LATINO - PUERTO RICAN',
+      'HISPANIC/LATINO - MEXICAN',
+      'HISPANIC/LATINO - CENTRAL AMERICAN',
+      'HISPANIC/LATINO - GUATEMALAN',
+      'HISPANIC/LATINO - COLUMBIAN',
+      'HISPANIC/LATINO - SALVADORAN',
+      'SOUTH AMERICAN'
+    ) THEN 'Hispanic / Latino'
+
+    -- Native Hawaiian / Other Pacific Islander
+    WHEN ed.race = 'NATIVE HAWAIIAN OR OTHER PACIFIC ISLANDER' 
+      THEN 'Native Hawaiian / Pacific Islander'
+
+    -- Multiple races
+    WHEN ed.race = 'MULTIPLE RACE/ETHNICITY' 
+      THEN 'Multiple Race / Ethnicity'
+
+    -- Unknown / declined / unable to obtain
+    WHEN ed.race IN (
+      'UNKNOWN',
+      'PATIENT DECLINED TO ANSWER',
+      'UNABLE TO OBTAIN'
+    ) THEN 'Unknown / Declined / Unable to Obtain'
+
+    -- Everything else (e.g., code “OTHER” or any unanticipated string)
+    ELSE 'Other'
+  END AS race_group,
+  ed.race
+
+FROM 
+  `physionet-data.mimiciv_ed.edstays` AS ed
+LEFT JOIN 
+  `physionet-data.mimiciv_3_1_hosp.patients` AS p
+ON 
+  ed.subject_id = p.subject_id
+LEFT JOIN 
+  `physionet-data.mimiciv_3_1_hosp.admissions` AS a
+ON
+  ed.subject_id = a.subject_id
+
+ORDER BY subject_id ASC
+```
 
 ---
 
 ## Key Findings
 
-- Mental health-related diagnoses are associated with significantly higher readmission rates than non-mental health diagnoses.
-- Substance-related disorders and personality/behavioral disorders are the leading contributors to readmissions.
-- Patients aged 40–59, especially unmarried men, are disproportionately represented in readmission cases.
-- Race and ethnicity are correlated with elevated readmission rates, indicating potential disparities in care or access.
-- Patients who leave the emergency department before receiving adequate treatment are more likely to experience higher readmission rates.
-- Socioeconomic factors—such as insurance status, employment, and housing—likely play a role but require more data.
-- A notable association between readmission and mortality suggests that readmission may be a proxy for inadequate care or discharge planning.
+1. **Do patients with mental health diagnoses face higher 30-day readmission rates than those with non-mental health diagnoses in the Emergency Department?**
+    1. Mental health related diagnoses drive readmissions in the emergency department: **Patients with a mental health conditions were readmitted nearly** **twice as often**. This points to the need for more intervention and programs aimed at reducing readmissions.
+    
+    ![output.png](attachment:251c544d-9f62-4b26-b48a-c830ba8f94bc:output.png)
+    
+
+1.  **Which mental health diagnoses have the highest readmission rates?**
+    1. Substance-Related Disorders and Personality Disorders are the leading drivers of readmission rates, with readmission levels nearly double—or more than—the overall average. Across almost all age groups, these two diagnoses consistently have the highest readmission rates. Notably, **patients in their 50s** with Substance-Related Disorders had the highest single age-diagnosis combination, with a **striking 78% readmission rate**
+        
+        ![proportion of readmission by mh cat.png](attachment:22bee1da-8f12-4d2f-bd59-153f8c8680f0:proportion_of_readmission_by_mh_cat.png)
+        
+    
+    ![readmissions by age group and mental health category.png](attachment:b78b9306-1c0e-416a-8273-b85030436a46:readmissions_by_age_group_and_mental_health_category.png)
+    
+2. **What gender has the highest readmission rate?**
+    1. More **male patients** are admitted to the ED compared to women and also have **higher overall readmission rates**. Among men, **Substance-Related Mental Health Disorders** are the leading driver of readmissions, with a rate of **67%**, followed by **Personality and Behavioral Disorders** at **53%**. In contrast, women have a **55% readmission rate** for Personality and Behavioral Disorders—**slightly higher than men**—and a significantly lower **29%** rate for Substance-Related Disorders, highlighting a **reversal in key drivers between genders**.
+        
+        ![readmission_by_gender.png](attachment:2d7fbfee-a7a9-4e7b-9868-d88ef024a161:readmission_by_gender.png)
+        
+        ![readmission_by_gender_and_diagnoses.png](attachment:0db8860f-4ad7-4af0-88e8-dbea74da2b86:readmission_by_gender_and_diagnoses.png)
+        
+3. ***What age group has the highest readmission rate?*** 
+    1. The two highest age groups with the highest proportion of readmissions were those aged **50-59 and 40-59**, with proportions of readmissions that were about **72% and 53%**, respectively. These groups have significantly different proportions compared to other groups. Suggesting a greater need for targeted intervention for this group.
+    
+    ![age_byproportion_readmissions.png](attachment:6830d06c-2148-4b47-a106-41e4b6c1b861:age_byproportion_readmissions.png)
+    
+4. **What are readmission rates by martial status? how do readmission rates differ?**
+    1. All groups exhibit high rates of readmission, with the exception of patients who are married or categorized as "None", suggesting that individuals with partner support may be at lower risk of returning to the emergency department. **Partnership may act as protective factor against negative health outcomes.**
+        
+        ![marital_status_by_readmissions.png](attachment:9b4e3f09-14c7-4278-b85e-237ce9a63520:marital_status_by_readmissions.png)
+        
+5. **What are the readmission rates by racial group?**
+    1. Groups above the mean readmission rate indicate potential disparities amongst patients from certain backgrounds. These disparities may be tied to various factors such as cultural barriers or socioeconomic background. 
+    
+    ![output.png](attachment:502eb691-9d8c-4590-89d6-a2f3f2706a8b:output.png)
+    
+6. **Which discharge outcome is linked to higher readmission rates?**
+    1. Patients who leave the emergency department before receiving adequate treatment are more likely to experience higher readmission rates. Patients may leave for various reasons such as long wait times, so its crucial to understand the reasons patients leave without care.
+    
+    ![readmission_rate_by_disposition.png](attachment:3be3af2d-7d6c-4490-9e26-b9fc6aaf3e4d:readmission_rate_by_disposition.png)
+    
+
+1. **What type of insurance is associated with higher rates of readmission?**
+    1. Insurance types, except for those indicating 'None' and 'Private,' had high readmission rates, with those indicating 'Other' having the highest. Meanwhile, patients with private insurance had the lowest readmission rates, which could indicate a correlation with socioeconomic status. 
+    
+    ![insurance_by_readmission.png](attachment:a096feab-7347-4082-b11a-8173b26ec65e:insurance_by_readmission.png)
+    
+
+1. **Is there an association between high readmission rates and patient mortality?**
+    1. Patients who died had significantly more readmissions than those who survived, suggesting an association between the two. This warrants further investigation to determine whether deaths are linked to the ED processes. Given this connection, reducing readmission rates may help lower patient mortality.
+    
+    ![output.png](attachment:a58ad1c9-c52e-4934-b979-2022cd337d81:output.png)
+    
 
 ## Results
 
@@ -435,8 +470,19 @@ To answer this question I analyzed 450K ED visits from the Beth Israel MIMIC-IV 
 ## **Limitations**
 
 - Socioeconomic status was not measured in this project.
-- Time-and-trend analyses were not performed; such analyses could help identify periods of ED overcrowding.
-- Length of stay was included as a study variable.
+- Length of stay wasn’t included as a study variable.
 - ICD codes were aggregated into broad categories rather than examined at a granular level.
 - Data were collected from a single hospital, limiting the generalizability of findings.
 - Only 30 day admissions were included. Readmissions beyond 30 days were not captured, limiting analyzing longer-term outcomes.
+
+---
+
+## Sources
+
+- Dhaliwal JS, Dang AK. Reducing Hospital Readmissions. [Updated 2024 Jun 7]. In: StatPearls [Internet]. Treasure Island (FL): StatPearls Publishing; 2025 Jan-. Available from: https://www.ncbi.nlm.nih.gov/books/NBK606114/
+- Six Domains of Healthcare Quality. Content last reviewed March 2025. Agency for Healthcare Research and Quality, Rockville, MD. https://www.ahrq.gov/talkingquality/measures/six-domains.html
+- Johnson, A., Bulgarelli, L., Pollard, T., Gow, B., Moody, B., Horng, S., Celi, L. A., & Mark, R. (2024). *MIMIC-IV (version 3.1)*. PhysioNet. [**https://doi.org/10.13026/kpb9-mt58**](https://doi.org/10.13026/kpb9-mt58)
+
+---
+
+### **Next Steps**
