@@ -1,20 +1,21 @@
 ![Mental Health Data Analysis](mental_health_data_analysis.png)
 
-## **Project Summary**
+## **Project Introduction**
 
-- This project investigates the risk factors associated with high readmission rates in the Emergency Department (ED) for patients diagnosed with a mental health condition. High readmission rates are indicative of poor operational performance and are often linked to increased patient mortality, hospital-acquired conditions, higher patient costs, overcrowding, and a greater overall burden on the healthcare system. By analyzing readmission data, this project aims to identify the key risk factors contributing to higher readmission rates.
+Since I’ve began my journey into the data science field, I’ve been driven by one question: how can we use data to improve mental health outcomes? That curiosity has led me to explore healthcare quality frameworks, specifically SEPTEE(Safety, Effectiveness, Patient-centeredness, Timeliness, Efficiency, Equity).
+
+Using these dimensions, I identified readmission rates as a key indicator. Prior research has shown high readmission rates lead to resource strain, higher mortality risk, increased patient and hospital costs.
+
+This led me to my primary research question: Do patients with mental health diagnoses face higher 30-day readmission rates than those with non-mental health diagnoses in the Emergency Department (ED)?
+
+To answer this question I analyzed 450K ED visits from the Beth Israel MIMIC-IV dataset (10 years of deidentified patient data), using BigQuery SQL for data querying and Python for statistical testing and visualization.
 
 ---
 
 ## **Objectives**
 
-- Compare admission rates between mental health diagnoses and other medical conditions.
-- Investigate the relationship between readmission rates and  mortality.
-- Identify which mental health diagnoses have the highest readmission rates.
-- Examine disparities in readmission rates across racial, age, and gender groups.
-- Explore the interaction between marital status and readmission rates.
-- Explore how readmission rates differ based on arrival transport and disposition.
-- Provide data-driven recommendations to reduce readmission rates.
+- Analyze patterns and disparities in emergency department readmissions related to mental health diagnoses across demographic factors
+- Identify key risk factors contributing to high readmission and mortality rates to inform data-driven recommendations for improved care.
 
 ---
 
