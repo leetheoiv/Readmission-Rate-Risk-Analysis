@@ -305,55 +305,56 @@ ORDER BY subject_id ASC
 1. **Do patients with mental health diagnoses face higher 30-day readmission rates than those with non-mental health diagnoses in the Emergency Department?**
     1. Mental health related diagnoses drive readmissions in the emergency department: **Patients with a mental health conditions were readmitted nearly** **twice as often**. This points to the need for more intervention and programs aimed at reducing readmissions.
     
-    ![output.png](attachment:251c544d-9f62-4b26-b48a-c830ba8f94bc:output.png)
+    ![Readmission by Diagnosis](graphs/readmission%20by%20type%20of%20diagnoses.png)
     
 
 1.  **Which mental health diagnoses have the highest readmission rates?**
-    1. Substance-Related Disorders and Personality Disorders are the leading drivers of readmission rates, with readmission levels nearly double—or more than—the overall average. Across almost all age groups, these two diagnoses consistently have the highest readmission rates. Notably, **patients in their 50s** with Substance-Related Disorders had the highest single age-diagnosis combination, with a **striking 78% readmission rate**
+    1. Substance-Related Disorders and Personality Disorders are the leading drivers of readmission rates, with readmission levels nearly double—or more than—the overall average. Across almost all age groups, these two diagnoses consistently have the highest readmission rates. 
         
-        ![proportion of readmission by mh cat.png](attachment:22bee1da-8f12-4d2f-bd59-153f8c8680f0:proportion_of_readmission_by_mh_cat.png)
+        ![Proportion of Readmission by MH Category](graphs/proportion%20of%20readmission%20by%20mh%20cat.png)
         
-    
-    ![readmissions by age group and mental health category.png](attachment:b78b9306-1c0e-416a-8273-b85030436a46:readmissions_by_age_group_and_mental_health_category.png)
     
 2. **What gender has the highest readmission rate?**
     1. More **male patients** are admitted to the ED compared to women and also have **higher overall readmission rates**. Among men, **Substance-Related Mental Health Disorders** are the leading driver of readmissions, with a rate of **67%**, followed by **Personality and Behavioral Disorders** at **53%**. In contrast, women have a **55% readmission rate** for Personality and Behavioral Disorders—**slightly higher than men**—and a significantly lower **29%** rate for Substance-Related Disorders, highlighting a **reversal in key drivers between genders**.
         
-        ![readmission_by_gender.png](attachment:2d7fbfee-a7a9-4e7b-9868-d88ef024a161:readmission_by_gender.png)
+        ![Readmission by Gender](graphs/readmission_by_gender.png)
         
-        ![readmission_by_gender_and_diagnoses.png](attachment:0db8860f-4ad7-4af0-88e8-dbea74da2b86:readmission_by_gender_and_diagnoses.png)
+        ![Readmission by Gender and Diagnoses](graphs/readmission_by_gender_and_diagnoses.png)
         
 3. ***What age group has the highest readmission rate?*** 
-    1. The two highest age groups with the highest proportion of readmissions were those aged **50-59 and 40-59**, with proportions of readmissions that were about **72% and 53%**, respectively. These groups have significantly different proportions compared to other groups. Suggesting a greater need for targeted intervention for this group.
+    1. The two highest age groups with the highest proportion of readmissions were those aged **50-59 and 40-59**, with proportions of readmissions that were about **72% and 53%**, respectively. These groups have significantly different proportions compared to other groups. Notably, **patients in their 50s** with Substance-Related Disorders had the highest single age-diagnosis combination, with a **striking 78% readmission rate**. Suggesting a greater need for targeted intervention for this group.
     
-    ![age_byproportion_readmissions.png](attachment:6830d06c-2148-4b47-a106-41e4b6c1b861:age_byproportion_readmissions.png)
+    ![age_byproportion_readmissions.png](graphs/age_byproportion_readmissions.png)
+
+   ![Readmissions by Age Group and Mental Health Category](graphs/readmissions%20by%20age%20group%20and%20mental%20health%20category.png)
+
     
-4. **What are readmission rates by martial status? how do readmission rates differ?**
+5. **What are readmission rates by martial status? how do readmission rates differ?**
     1. All groups exhibit high rates of readmission, with the exception of patients who are married or categorized as "None", suggesting that individuals with partner support may be at lower risk of returning to the emergency department. **Partnership may act as protective factor against negative health outcomes.**
         
-        ![marital_status_by_readmissions.png](attachment:9b4e3f09-14c7-4278-b85e-237ce9a63520:marital_status_by_readmissions.png)
+        ![marital_status_by_readmissions.png](graphs/marital_status_by_readmissions.png)
         
-5. **What are the readmission rates by racial group?**
+6. **What are the readmission rates by racial group?**
     1. Groups above the mean readmission rate indicate potential disparities amongst patients from certain backgrounds. These disparities may be tied to various factors such as cultural barriers or socioeconomic background. 
     
-    ![output.png](attachment:502eb691-9d8c-4590-89d6-a2f3f2706a8b:output.png)
+    ![output_race.png](graphs/readmissions_by_race.png)
     
-6. **Which discharge outcome is linked to higher readmission rates?**
+7. **Which discharge outcome is linked to higher readmission rates?**
     1. Patients who leave the emergency department before receiving adequate treatment are more likely to experience higher readmission rates. Patients may leave for various reasons such as long wait times, so its crucial to understand the reasons patients leave without care.
     
-    ![readmission_rate_by_disposition.png](attachment:3be3af2d-7d6c-4490-9e26-b9fc6aaf3e4d:readmission_rate_by_disposition.png)
+    ![readmission_rate_by_disposition.png](graphs/readmission_rate_by_disposition.png)
     
 
 1. **What type of insurance is associated with higher rates of readmission?**
     1. Insurance types, except for those indicating 'None' and 'Private,' had high readmission rates, with those indicating 'Other' having the highest. Meanwhile, patients with private insurance had the lowest readmission rates, which could indicate a correlation with socioeconomic status. 
     
-    ![insurance_by_readmission.png](attachment:a096feab-7347-4082-b11a-8173b26ec65e:insurance_by_readmission.png)
+    ![insurance_by_readmission.png](graphs/insurance_by_readmission.png)
     
 
 1. **Is there an association between high readmission rates and patient mortality?**
     1. Patients who died had significantly more readmissions than those who survived, suggesting an association between the two. This warrants further investigation to determine whether deaths are linked to the ED processes. Given this connection, reducing readmission rates may help lower patient mortality.
     
-    ![output.png](attachment:a58ad1c9-c52e-4934-b979-2022cd337d81:output.png)
+    ![mortality.png](graphs/mortality_by_readmission_rate.png)
     
 
 ## Results
