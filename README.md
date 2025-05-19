@@ -2,7 +2,7 @@
 
 📓 **Jupyter Notebook:**  
 Explore the full analysis in the notebook here:  
-[Readmission Rate Analysis.ipynb](./Readmission%20Rate%20Analysis.ipynb)
+[Readmission Rate Analysis.ipynb](./Readmission_Rate_Analysis.ipynb)
 
 
 ## **Project Introduction**
